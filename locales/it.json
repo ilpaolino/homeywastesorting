@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Raccolta Differenziata",
+    "fieldset_title": "Promemoria Raccolta Differenziata",
+    "save_button": "Salva Impostazioni",
+    "settings_saved": "Impostazioni salvate!"
+  },
+  "settings": {
+    "title": "Impostazioni Raccolta Differenziata",
+    "subtitle": "Gestisci i promemoria per la raccolta differenziata"
+  },
+  "waste": {
+    "carta": "Carta",
+    "plastica": "Plastica",
+    "secco": "Secco",
+    "umido": "Umido",
+    "vetro": "Vetro"
+  },
+  "days": {
+    "monday": "Lunedì",
+    "tuesday": "Martedì",
+    "wednesday": "Mercoledì",
+    "thursday": "Giovedì",
+    "friday": "Venerdì",
+    "saturday": "Sabato",
+    "sunday": "Domenica"
+  },
+  "frequency": {
+    "weekly": "Settimanale",
+    "biweekly": "Bisettimanale",
+    "monthly": "Mensile"
+  }
+}

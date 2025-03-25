@@ -1,1 +1,33 @@
-{}
+{
+  "app": {
+    "title": "Waste Collection Reminder",
+    "fieldset_title": "Waste Collection Reminder",
+    "save_button": "Save Settings",
+    "settings_saved": "Settings saved!"
+  },
+  "settings": {
+    "title": "Waste Collection Settings",
+    "subtitle": "Manage your waste collection reminders"
+  },
+  "waste": {
+    "carta": "Paper",
+    "plastica": "Plastic",
+    "secco": "Dry Waste",
+    "umido": "Organic Waste",
+    "vetro": "Glass"
+  },
+  "days": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "frequency": {
+    "weekly": "Weekly",
+    "biweekly": "Biweekly",
+    "monthly": "Monthly"
+  }
+}
