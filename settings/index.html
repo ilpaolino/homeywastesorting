@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title data-i18n="app.title"></title>
+  <title>Impostazioni Raccolta Differenziata</title>
+  <!-- Carica Homey prima di tutto -->
   <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <script type="text/javascript" src="scripts/index.js" data-origin="settings"></script>
   <style>
     /* Stili base per la navigazione fra pagine */
     .page {
@@ -14,27 +16,37 @@
       display: block;
     }
 
-    /* Stili per la lista dei rifiuti */
-    .waste-item {
+    /* Altri stili */
+    .waste-item, .schedule-item {
       display: flex;
       align-items: center;
       margin-bottom: 8px;
     }
 
-    .waste-label {
-      flex-grow: 1;
-    }
-
-    .waste-item button {
-      margin-left: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-
-    /* Stili per l'input di aggiunta */
-    #new-waste-input {
+    .waste-label, .schedule-summary {
+      flex: 1;
       margin-right: 8px;
+    }
+    #waste-list {
+      margin-top: 16px;
+    }
+    #btn-schedule, #btn-waste {
+      margin-bottom: 16px;
+    }
+    button.edit-waste-btn, button.delete-waste-btn, button.edit-schedule-btn, button.delete-schedule-btn {
+      padding: 4px 6px !important;
+      margin-left: 8px;
+    }
+    button.edit-waste-btn svg, button.delete-waste-btn svg, button.edit-schedule-btn svg, button.delete-schedule-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+    button.confirm-homey-style {
+      background: linear-gradient(30deg, #005cd5, #367cff 33%, #52baff 66%, #52deff) 33% top;
+      background-size: 200% 100%;
+    }
+    button.confirm-homey-style svg {
+      color: #ffffff;
     }
   </style>
 </head>
@@ -52,7 +64,7 @@
   </div>
 </div>
 
-<!-- Pagina "Tipo di rifiuto": gestione dinamica della lista -->
+<!-- Pagina "Tipo di rifiuto" -->
 <div id="page-waste" class="page">
   <header class="homey-header">
     <h1 class="homey-title" data-i18n="settings.waste_title">Tipo di rifiuto</h1>
@@ -60,243 +72,74 @@
   <fieldset class="homey-form-fieldset">
     <legend class="homey-form-legend" data-i18n="settings.waste_legend">Gestisci i tipi di rifiuto</legend>
     <div id="waste-list">
-      <!-- La lista dei rifiuti verrà renderizzata qui -->
-    </div>
-    <div class="homey-form-group">
-      <input type="text" id="new-waste-input" class="homey-form-input" placeholder="Nuovo tipo di rifiuto"/>
-      <button id="add-waste-btn" class="homey-button-primary-full" data-i18n="settings.add_waste">Aggiungi</button>
+      <!-- Qui verranno renderizzati i tipi di rifiuto -->
     </div>
   </fieldset>
-  <button id="save-waste" class="homey-button-primary-full" data-i18n="app.save_button">Salva Impostazioni</button>
+  <div class="homey-form-group">
+    <div class="waste-item">
+      <input type="text" id="new-waste-input" class="homey-form-input" placeholder="Nuovo tipo di rifiuto"/>
+      <button id="add-waste-btn" class="edit-waste-btn confirm-homey-style" data-i18n="settings.add">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="32" height="32" stroke-width="1"> <path d="M12 5l0 14"></path> <path d="M5 12l14 0"></path> </svg>
+      </button>
+    </div>
+  </div>
   <button id="back-waste" class="homey-button-secondary" data-i18n="settings.back">Indietro</button>
 </div>
 
-<!-- Pagina "Cadenza di ritiro": gestione delle impostazioni di raccolta -->
+<!-- Pagina "Cadenza di ritiro" -->
 <div id="page-schedule" class="page">
   <header class="homey-header">
     <h1 class="homey-title" data-i18n="settings.schedule_title">Cadenza di ritiro</h1>
   </header>
   <fieldset class="homey-form-fieldset">
-    <legend class="homey-form-legend" data-i18n="settings.schedule_legend">Configura la cadenza di ritiro</legend>
-    <div id="schedule-form">
-      <!-- Giorno della settimana -->
-      <div class="homey-form-group">
-        <label class="homey-form-label" data-i18n="settings.schedule_day">Giorno della settimana</label>
-        <select id="schedule-day" class="homey-form-select"></select>
-      </div>
-      <!-- Frequenza: settimanale, bisettimanale, mensile -->
-      <div class="homey-form-group">
-        <label class="homey-form-label" data-i18n="settings.schedule_frequency">Frequenza</label>
-        <select id="schedule-frequency" class="homey-form-select">
-          <option value="weekly" data-i18n="frequency.weekly">Settimanale</option>
-          <option value="biweekly" data-i18n="frequency.biweekly">Bisettimanale</option>
-          <option value="monthly" data-i18n="frequency.monthly">Mensile</option>
-        </select>
-      </div>
-      <!-- Settimana del mese di partenza (1-4) -->
-      <div class="homey-form-group">
-        <label class="homey-form-label" data-i18n="settings.schedule_start_week">Settimana di partenza</label>
-        <select id="schedule-start-week" class="homey-form-select">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-        </select>
-      </div>
-      <!-- Giorno (1-7) -->
-      <div class="homey-form-group">
-        <label class="homey-form-label" data-i18n="settings.schedule_day_of_month">Giorno</label>
-        <select id="schedule-day-of-month" class="homey-form-select">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-        </select>
-      </div>
-      <!-- Tipo di rifiuto: popolato dinamicamente -->
-      <div class="homey-form-group">
-        <label class="homey-form-label" data-i18n="settings.schedule_waste_type">Tipo di rifiuto</label>
-        <select id="schedule-waste-type" class="homey-form-select"></select>
-      </div>
+    <legend class="homey-form-legend" data-i18n="settings.schedule_legend">Gestisci le cadenze di ritiro</legend>
+    <div id="schedule-list">
+      <!-- Qui verranno renderizzate le cadenze -->
     </div>
   </fieldset>
-  <button id="save-schedule" class="homey-button-primary-full" data-i18n="app.save_button">Salva Impostazioni</button>
+  <button id="add-schedule-btn" class="homey-button-primary-full">Aggiungi cadenza</button>
   <button id="back-schedule" class="homey-button-secondary" data-i18n="settings.back">Indietro</button>
 </div>
 
+<!-- Script inline: onHomeyReady verrà invocata da Homey quando è pronta -->
 <script type="text/javascript">
   function onHomeyReady(Homey) {
-    // Variabile globale per i tipi di rifiuto
-    var wasteTypes = [];
+    // Lista dei file da caricare dinamicamente
+    const files = [
+      'scripts/showPage.js',
+      'scripts/icons.js',
+      'scripts/wasteFunctions.js',
+      'scripts/scheduleFunctions.js'
+    ];
 
-    // Navigazione fra pagine
-    function showPage(pageId) {
-      var pages = document.querySelectorAll('.page');
-      for (var i = 0; i < pages.length; i++) {
-        pages[i].classList.remove('active');
-      }
-      document.getElementById(pageId)
-        .classList
-        .add('active');
-    }
+    // Usa la funzione separata per caricare gli script in sequenza
+    loadScriptsSequentially(files, function() {
+      // Dopo aver caricato tutti gli script, crea le istanze dei moduli tramite le factory
+      wasteSortingApp.waste = wasteSortingApp.createWasteFunctions(Homey);
+      wasteSortingApp.schedule = wasteSortingApp.createScheduleFunctions(Homey);
 
-    // Popola il select dei giorni della settimana nella pagina schedule
-    function populateDaySelect() {
-      var days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-      var select = document.getElementById('schedule-day');
-      select.innerHTML = '';
-      days.forEach(function(day) {
-        var option = document.createElement('option');
-        option.value = day;
-        option.textContent = Homey.__('days.' + day);
-        select.appendChild(option);
-      });
-    }
-
-    // Carica i tipi di rifiuto salvati (o inizia con un array vuoto)
-    function loadWasteTypes(callback) {
-      Homey.get('wasteTypes', function(err, data) {
-        if (err || !data) {
-          wasteTypes = [];
-        } else {
-          wasteTypes = data;
-        }
-        if (callback) callback();
-      });
-    }
-
-    // Renderizza la lista dei tipi di rifiuto
-    function renderWasteList() {
-      var container = document.getElementById('waste-list');
-      container.innerHTML = '';
-      wasteTypes.forEach(function(item, index) {
-        var div = document.createElement('div');
-        div.className = 'waste-item';
-        div.setAttribute('data-index', index);
-
-        var span = document.createElement('span');
-        span.className = 'waste-label';
-        span.textContent = item.label;
-        div.appendChild(span);
-
-        // Bottone per modificare (icona matita)
-        var editBtn = document.createElement('button');
-        editBtn.className = 'edit-waste';
-        editBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>';
-        editBtn.addEventListener('click', function() {
-          // Sostituisce lo span con un input per l'editing
-          var input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'homey-form-input';
-          input.value = item.label;
-          input.addEventListener('blur', function() {
-            item.label = input.value;
-            renderWasteList();
-          });
-          input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-              input.blur();
-            }
-          });
-          div.replaceChild(input, span);
-          input.focus();
-        });
-        div.appendChild(editBtn);
-
-        // Bottone per eliminare (icona cestino)
-        var deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-waste';
-        deleteBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>';
-        deleteBtn.addEventListener('click', function() {
-          wasteTypes.splice(index, 1);
-          renderWasteList();
-        });
-        div.appendChild(deleteBtn);
-
-        container.appendChild(div);
-      });
-    }
-
-    // Gestione del pulsante per aggiungere un nuovo tipo di rifiuto
-    document.getElementById('add-waste-btn')
-      .addEventListener('click', function() {
-        var input = document.getElementById('new-waste-input');
-        var newLabel = input.value.trim();
-        if (newLabel !== '') {
-          var newWaste = {
-            id: 'waste_' + new Date().getTime(),
-            label: newLabel
-          };
-          wasteTypes.push(newWaste);
-          input.value = '';
-          renderWasteList();
-        }
-      });
-
-    // Salva i tipi di rifiuto
-    document.getElementById('save-waste')
-      .addEventListener('click', function() {
-        Homey.set('wasteTypes', wasteTypes, function(err) {
-          if (err) return Homey.alert(err);
-          Homey.alert(Homey.__('app.settings_saved'));
+      // Imposta i listener per i pulsanti
+      document.getElementById('btn-waste').addEventListener('click', function() {
+        showPage('page-waste'); // Definita in showPage.js
+        wasteSortingApp.waste.load(function(types) {
+          wasteSortingApp.waste.render(Homey, types);
         });
       });
-
-    // Carica i tipi di rifiuto anche per la select della pagina "Cadenza di ritiro"
-    function loadWasteTypesIntoSchedule() {
-      loadWasteTypes(function() {
-        var select = document.getElementById('schedule-waste-type');
-        select.innerHTML = '';
-        wasteTypes.forEach(function(item) {
-          var opt = document.createElement('option');
-          opt.value = item.id;
-          opt.textContent = item.label;
-          select.appendChild(opt);
-        });
-      });
-    }
-
-    // Salva le impostazioni della cadenza di ritiro
-    document.getElementById('save-schedule')
-      .addEventListener('click', function() {
-        var schedule = {
-          day: document.getElementById('schedule-day').value,
-          frequency: document.getElementById('schedule-frequency').value,
-          startWeek: document.getElementById('schedule-start-week').value,
-          dayOfMonth: document.getElementById('schedule-day-of-month').value,
-          wasteType: document.getElementById('schedule-waste-type').value
-        };
-        Homey.set('pickupSchedule', schedule, function(err) {
-          if (err) return Homey.alert(err);
-          Homey.alert(Homey.__('app.settings_saved'));
-        });
-      });
-
-    // Gestione dei pulsanti di navigazione
-    document.getElementById('btn-waste')
-      .addEventListener('click', function() {
-        showPage('page-waste');
-        loadWasteTypes(renderWasteList);
-      });
-    document.getElementById('btn-schedule')
-      .addEventListener('click', function() {
+      document.getElementById('btn-schedule').addEventListener('click', function() {
         showPage('page-schedule');
-        populateDaySelect();
-        loadWasteTypesIntoSchedule();
+        wasteSortingApp.schedule.load(function(schedules) {
+          wasteSortingApp.schedule.render(Homey, schedules);
+        });
       });
-    document.getElementById('back-waste')
-      .addEventListener('click', function() {
+      document.getElementById('back-waste').addEventListener('click', function() {
         showPage('page-index');
       });
-    document.getElementById('back-schedule')
-      .addEventListener('click', function() {
+      document.getElementById('back-schedule').addEventListener('click', function() {
         showPage('page-index');
       });
-
-    Homey.ready();
+      // Comunica a Homey che l'app è pronta
+      Homey.ready();
+    });
   }
 </script>
 </body>
